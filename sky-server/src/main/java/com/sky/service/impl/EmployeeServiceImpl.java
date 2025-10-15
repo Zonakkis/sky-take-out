@@ -16,6 +16,7 @@ import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
 import com.sky.service.EmployeeService;
+import com.sky.vo.EmployeeVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -24,6 +25,7 @@ import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class EmployeeServiceImpl implements EmployeeService {
@@ -104,15 +106,64 @@ public class EmployeeServiceImpl implements EmployeeService {
      * @param employeePageQueryDTO
      * @return
      */
-    public PageResult pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
+    public PageResult<EmployeeVO> pageQuery(EmployeePageQueryDTO employeePageQueryDTO) {
         int pageNum = employeePageQueryDTO.getPage();
         int pageSize = employeePageQueryDTO.getPageSize();
         PageHelper.startPage(pageNum, pageSize);
-        Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
 
+        Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
         long total = page.getTotal();
-        List<Employee> records = page.getResult();
+        List<EmployeeVO> records = page.getResult()
+                .stream().map(employee -> {
+                    EmployeeVO employeeVO = new EmployeeVO();
+                    BeanUtils.copyProperties(employee, employeeVO);
+                    return employeeVO;
+                }).collect(Collectors.toList());
         return new PageResult<>(total, records);
+    }
+
+    /**
+     * 设置员工状态
+     *
+     * @param status
+     * @param id
+     */
+    public void setStatus(Integer status, Long id) {
+        Employee employee = new Employee();
+        employee.setId(id);
+        employee.setStatus(status);
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employeeMapper.update(employee);
+    }
+
+    /**
+     * 根据id查询员工信息
+     *
+     * @param id
+     * @return
+     */
+    public EmployeeVO getById(Long id) {
+        Employee employee = employeeMapper.getById(id);
+        EmployeeVO employeeVO = new EmployeeVO();
+        if(employee == null)
+            throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
+        BeanUtils.copyProperties(employee, employeeVO);
+        return employeeVO;
+    }
+
+    /**
+     * 修改员工信息
+     *
+     * @param employeeDTO
+     * @return
+     */
+    public void update(EmployeeDTO employeeDTO) {
+        Employee employee = new Employee();
+        BeanUtils.copyProperties(employeeDTO, employee);
+        employee.setUpdateTime(LocalDateTime.now());
+        employee.setUpdateUser(BaseContext.getCurrentId());
+        employeeMapper.update(employee);
     }
 
 }

@@ -1,11 +1,11 @@
 package com.sky.service;
 
-import com.github.pagehelper.Page;
 import com.sky.dto.EmployeeDTO;
 import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.result.PageResult;
+import com.sky.vo.EmployeeVO;
 
 public interface EmployeeService {
 
@@ -27,5 +27,11 @@ public interface EmployeeService {
      * @param employeePageQueryDTO
      * @return
      */
-    PageResult<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+    PageResult<EmployeeVO> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+
+    void setStatus(Integer status, Long id);
+
+    EmployeeVO getById(Long id);
+
+    void update(EmployeeDTO employeeDTO);
 }
