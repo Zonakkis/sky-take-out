@@ -11,7 +11,7 @@ import com.sky.dto.EmployeeLoginDTO;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.exception.AccountLockedException;
-import com.sky.exception.AccountNotFoundException;
+import com.sky.exception.NotFoundException;
 import com.sky.exception.PasswordErrorException;
 import com.sky.mapper.EmployeeMapper;
 import com.sky.result.PageResult;
@@ -21,7 +21,6 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.util.DigestUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -52,7 +51,7 @@ public class EmployeeServiceImpl implements EmployeeService {
         //2、处理各种异常情况（用户名不存在、密码不对、账号被锁定）
         if (employee == null) {
             //账号不存在
-            throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
+            throw new NotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
         }
 
         //密码比对
@@ -145,9 +144,9 @@ public class EmployeeServiceImpl implements EmployeeService {
      */
     public EmployeeVO getById(Long id) {
         Employee employee = employeeMapper.getById(id);
-        EmployeeVO employeeVO = new EmployeeVO();
         if(employee == null)
-            throw new AccountNotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
+            throw new NotFoundException(MessageConstant.ACCOUNT_NOT_FOUND);
+        EmployeeVO employeeVO = new EmployeeVO();
         BeanUtils.copyProperties(employee, employeeVO);
         return employeeVO;
     }

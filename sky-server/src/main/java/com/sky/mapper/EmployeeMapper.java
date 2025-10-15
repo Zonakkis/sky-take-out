@@ -21,6 +21,7 @@ public interface EmployeeMapper {
 
     /**
      * 插入员工
+     *
      * @param employee
      */
     @Insert("insert into " +
@@ -31,6 +32,7 @@ public interface EmployeeMapper {
 
     /**
      * 分页查询
+     *
      * @param employeePageQueryDTO
      * @return
      */
@@ -38,12 +40,14 @@ public interface EmployeeMapper {
 
     /**
      * 更新员工信息
+     *
      * @param employee
      */
     void update(Employee employee);
 
     /**
      * 根据id查询员工
+     *
      * @param id
      * @return
      */
