@@ -1,4 +1,4 @@
-package com.sky.annotations;
+package com.sky.annotation;
 
 import com.sky.enumeration.OperationType;
 

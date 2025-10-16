@@ -1,19 +1,17 @@
-package com.sky.aspects;
+package com.sky.aspect;
 
-import com.sky.annotations.AutoFill;
+import com.sky.annotation.AutoFill;
 import com.sky.constant.AutoFillConstant;
 import com.sky.context.BaseContext;
 import com.sky.enumeration.OperationType;
 import lombok.extern.slf4j.Slf4j;
 import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.Signature;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.annotation.Before;
 import org.aspectj.lang.annotation.Pointcut;
 import org.aspectj.lang.reflect.MethodSignature;
 import org.springframework.stereotype.Component;
 
-import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.time.LocalDateTime;
 
@@ -21,7 +19,7 @@ import java.time.LocalDateTime;
 @Component
 @Slf4j
 public class AutoFillAspect {
-    @Pointcut("execution(* com.sky.mapper.*.*(..)) && @annotation(com.sky.annotations.AutoFill)")
+    @Pointcut("execution(* com.sky.mapper.*.*(..)) && @annotation(com.sky.annotation.AutoFill)")
     public void autoFillPointCut() {
     }
 
