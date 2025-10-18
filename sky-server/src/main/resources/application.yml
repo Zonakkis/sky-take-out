@@ -37,3 +37,16 @@ sky:
     admin-ttl: 7200000
     # 设置前端传递过来的令牌名称
     admin-token-name: token
+  aliyun-oss:
+    endpoint: {sky.aliyun-oss.endpoint}
+    access-key-id: {sky.aliyun-oss.access-key-id}
+    access-key-secret: {sky.aliyun-oss.access-key-secret}
+    bucket-name: {sky.aliyun-oss.bucket-name}
+    region: {sky.aliyun-oss.region}
+  qiniu-oss:
+    access-key: {sky.qiniu-oss.access-key}
+    secret-key: {sky.qiniu-oss.secret-key}
+    bucket-name: {sky.qiniu-oss.bucket-name}
+    region: {sky.qiniu-oss.region}
+    domain: {sky.qiniu-oss.domain}
+
