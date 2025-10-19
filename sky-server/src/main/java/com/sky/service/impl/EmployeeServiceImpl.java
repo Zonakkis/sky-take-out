@@ -101,14 +101,11 @@ public class EmployeeServiceImpl implements EmployeeService {
         int pageSize = employeePageQueryDTO.getPageSize();
         PageHelper.startPage(pageNum, pageSize);
 
-        Page<Employee> page = employeeMapper.pageQuery(employeePageQueryDTO);
+        Page<EmployeeVO> page = employeeMapper.pageQuery(employeePageQueryDTO);
+
         long total = page.getTotal();
-        List<EmployeeVO> records = page.getResult()
-                .stream().map(employee -> {
-                    EmployeeVO employeeVO = new EmployeeVO();
-                    BeanUtils.copyProperties(employee, employeeVO);
-                    return employeeVO;
-                }).collect(Collectors.toList());
+        List<EmployeeVO> records = page.getResult();
+
         return new PageResult<>(total, records);
     }
 

@@ -5,6 +5,7 @@ import com.sky.annotation.AutoFill;
 import com.sky.dto.EmployeePageQueryDTO;
 import com.sky.entity.Employee;
 import com.sky.enumeration.OperationType;
+import com.sky.vo.EmployeeVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
@@ -39,7 +40,7 @@ public interface EmployeeMapper {
      * @param employeePageQueryDTO
      * @return
      */
-    Page<Employee> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
+    Page<EmployeeVO> pageQuery(EmployeePageQueryDTO employeePageQueryDTO);
 
     /**
      * 更新员工信息
