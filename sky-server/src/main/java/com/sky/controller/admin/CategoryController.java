@@ -44,7 +44,7 @@ public class CategoryController {
      */
     @GetMapping("/{id}")
     @ApiOperation("查询分类信息")
-    public Result<CategoryVO> get(@PathVariable Long id) {
+    public Result<CategoryVO> getById(@PathVariable Long id) {
         CategoryVO categoryVO = categoryService.getById(id);
         return Result.success(categoryVO);
     }

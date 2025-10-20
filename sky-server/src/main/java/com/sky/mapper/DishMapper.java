@@ -2,6 +2,7 @@ package com.sky.mapper;
 
 import com.github.pagehelper.Page;
 import com.sky.annotation.AutoFill;
+import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.enumeration.OperationType;
@@ -28,13 +29,52 @@ public interface DishMapper {
     @AutoFill(OperationType.INSERT)
     void insert(Dish dish);
 
+
+    /**
+     * 根据分类id查询菜品列表
+     *
+     * @param categoryId
+     * @return
+     */
+    @Select("select id, name, category_id, price, image, description, status, create_time, update_time, create_user, update_user " +
+            "from dish " +
+            "where category_id = #{categoryId}")
+    List<Dish> listByCategoryId(Integer categoryId);
+
     /**
      * 菜品分页查询
      *
      * @param dishPageQueryDTO
      * @return
      */
-    Page<DishVO> pageQuery(DishPageQueryDTO dishPageQueryDTO);
+    Page<Dish> pageQuery(DishPageQueryDTO dishPageQueryDTO);
+
+
+    /**
+     * 根据id批量查询菜品
+     *
+     * @param ids
+     * @return
+     */
+    List<Dish> getByIds(List<Long> ids);
+
+    /**
+     * 根据id查询菜品
+     *
+     * @param id
+     * @return
+     */
+    @Select("select id, name, category_id, price, image, description, status, create_time, update_time, create_user, update_user " +
+            "from dish where id = #{id}")
+    Dish getById(Integer id);
+
+    /**
+     * 更新菜品信息
+     *
+     * @param dish
+     */
+    @AutoFill(OperationType.UPDATE)
+    void update(Dish dish);
 
     /**
      * 根据id批量删除菜品
@@ -42,11 +82,4 @@ public interface DishMapper {
      * @param ids
      */
     void deleteByIds(List<Long> ids);
-
-    /**
-     * 根据id批量查询菜品
-     * @param ids
-     * @return
-     */
-    List<Dish> getByIds(List<Long> ids);
 }

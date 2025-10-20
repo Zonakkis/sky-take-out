@@ -38,6 +38,15 @@ public interface CategoryMapper {
 
 
     /**
+     * 根据id批量查询分类
+     *
+     * @param ids
+     * @return
+     */
+    List<Category> getByIds(List<Long> ids);
+
+
+    /**
      * 分类分页查询
      *
      * @param categoryPageQueryDTO

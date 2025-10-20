@@ -16,12 +16,45 @@ public interface DishService {
     void createWithFalvors(DishDTO dishDTO);
 
     /**
+     * 根据id查询菜品
+     *
+     * @param id
+     * @return
+     */
+    DishVO getWithFlavorsById(Integer id);
+
+
+    /**
+     * 根据分类id查询菜品列表
+     *
+     * @param categoryId
+     * @return
+     */
+    List<DishVO> listByCategoryId(Integer categoryId);
+
+    /**
      * 菜品分页查询
      *
      * @param dishPageQueryDTO
      * @return
      */
     PageResult<DishVO> pageQuery(DishPageQueryDTO dishPageQueryDTO);
+
+
+    /**
+     * 设置菜品状态
+     *
+     * @param id
+     * @param status
+     */
+    void setStatus(Long id, Integer status);
+
+    /**
+     * 更新菜品信息
+     *
+     * @param dishDTO
+     */
+    void update(DishDTO dishDTO);
 
     /**
      * 根据id批量删除菜品

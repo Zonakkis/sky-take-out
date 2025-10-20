@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Objects;
 
 @RestController
 @RequestMapping("/admin/dish")
@@ -38,6 +39,34 @@ public class DishController {
     }
 
     /**
+     * 根据id查询菜品信息
+     *
+     * @param id
+     * @return
+     */
+    @GetMapping("/{id}")
+    @ApiOperation("查询菜品信息")
+    public Result<DishVO> getById(@PathVariable Integer id) {
+        log.info("查询菜品信息：{}", id);
+        DishVO dishVO = dishService.getWithFlavorsById(id);
+        return Result.success(dishVO);
+    }
+
+    /**
+     * 查询菜品列表
+     *
+     * @param categoryId
+     * @return
+     */
+    @GetMapping("/list")
+    @ApiOperation("查询菜品列表")
+    public Result<List<DishVO>> list(Integer categoryId) {
+        log.info("查询菜品列表：{}", categoryId);
+        List<DishVO> dishVOS = dishService.listByCategoryId(categoryId);
+        return Result.success(dishVOS);
+    }
+
+    /**
      * 菜品分页查询
      *
      * @param dishPageQueryDTO
@@ -52,6 +81,32 @@ public class DishController {
     }
 
     /**
+     * 设置菜品状态
+     *
+     * @return
+     */
+    @PostMapping("/status/{status}")
+    @ApiOperation("设置菜品状态")
+    public Result<?> setStatus(Long id, @PathVariable Integer status) {
+        dishService.setStatus(id, status);
+        return Result.success();
+    }
+
+    /**
+     * 更新菜品
+     *
+     * @param dishDTO
+     * @return
+     */
+    @PutMapping
+    @ApiOperation("更新菜品")
+    public Result<?> update(@RequestBody DishDTO dishDTO) {
+        log.info("更新菜品：{}", dishDTO);
+        dishService.update(dishDTO);
+        return Result.success();
+    }
+
+    /**
      * 批量删除菜品
      *
      * @param ids
@@ -59,7 +114,7 @@ public class DishController {
      */
     @DeleteMapping
     @ApiOperation("批量删除菜品")
-    public Result<?> delete(@RequestParam List<Long> ids){
+    public Result<?> delete(@RequestParam List<Long> ids) {
         log.info("批量删除菜品：{}", ids);
         dishService.deleteByIds(ids);
         return Result.success();
