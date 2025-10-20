@@ -49,6 +49,9 @@ public class DishServiceImpl implements DishService {
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO, dish);
 
+        // 菜品默认为禁用状态
+        dish.setStatus(StatusConstant.DISABLE);
+
         dishMapper.insert(dish);
 
         Long dishId = dish.getId();
