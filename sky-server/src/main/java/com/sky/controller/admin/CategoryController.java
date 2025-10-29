@@ -58,7 +58,7 @@ public class CategoryController {
     @GetMapping("/list")
     @ApiOperation("查询分类列表")
     public Result<List<CategoryVO>> list(Integer type){
-        List<CategoryVO> list = categoryService.listByType(type);
+        List<CategoryVO> list = categoryService.list(type);
         return Result.success(list);
     }
 

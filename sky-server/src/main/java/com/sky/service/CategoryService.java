@@ -23,6 +23,15 @@ public interface CategoryService {
      */
     CategoryVO getById(Long id);
 
+
+    /**
+     * 根据类型查询分类列表
+     *
+     * @param type
+     * @return
+     */
+    List<CategoryVO> list(Integer type);
+
     /**
      * 分类分页查询
      *
@@ -52,12 +61,4 @@ public interface CategoryService {
      * @param id
      */
     void deleteById(Long id);
-
-    /**
-     * 根据类型查询分类列表
-     *
-     * @param type
-     * @return
-     */
-    List<CategoryVO> listByType(Integer type);
 }

@@ -42,6 +42,9 @@ sky:
     admin-ttl: 7200000
     # 设置前端传递过来的令牌名称
     admin-token-name: token
+    user-secret-key: itheima
+    user-ttl: 7200000
+    user-token-name: authentication
   aliyun-oss:
     endpoint: ${sky.aliyun-oss.endpoint}
     access-key-id: ${sky.aliyun-oss.access-key-id}
@@ -54,4 +57,7 @@ sky:
     bucket-name: ${sky.qiniu-oss.bucket-name}
     region: ${sky.qiniu-oss.region}
     domain: ${sky.qiniu-oss.domain}
+  wechat:
+    appid: ${sky.wechat.appid}
+    secret: ${sky.wechat.secret}
 

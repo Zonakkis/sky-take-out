@@ -2,12 +2,9 @@ package com.sky.mapper;
 
 import com.github.pagehelper.Page;
 import com.sky.annotation.AutoFill;
-import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
 import com.sky.entity.Dish;
 import com.sky.enumeration.OperationType;
-import com.sky.service.DishService;
-import com.sky.vo.DishVO;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
@@ -42,15 +39,12 @@ public interface DishMapper {
 
 
     /**
-     * 根据分类id查询菜品列表
+     * 根据分类id和状态查询菜品列表
      *
      * @param categoryId
      * @return
      */
-    @Select("select id, name, category_id, price, image, description, status, create_time, update_time, create_user, update_user " +
-            "from dish " +
-            "where category_id = #{categoryId}")
-    List<Dish> listByCategoryId(Integer categoryId);
+    List<Dish> listByCategoryId(Long categoryId, Integer status);
 
     /**
      * 菜品分页查询
@@ -67,7 +61,7 @@ public interface DishMapper {
      * @param ids
      * @return
      */
-    List<Dish> getByIds(List<Long> ids);
+    List<Dish> listByIds(List<Long> ids);
 
     /**
      * 根据id查询菜品
@@ -77,7 +71,7 @@ public interface DishMapper {
      */
     @Select("select id, name, category_id, price, image, description, status, create_time, update_time, create_user, update_user " +
             "from dish where id = #{id}")
-    Dish getById(Integer id);
+    Dish getById(Long id);
 
     /**
      * 更新菜品信息

@@ -25,6 +25,15 @@ public interface SetmealService {
     SetmealVO getWithSetmealDishesById(Long id);
 
     /**
+     * 根据分类id和状态查询套餐列表
+     *
+     * @param categoryId
+     * @param status
+     * @return
+     */
+    List<SetmealVO> listByCategoryId(Long categoryId, Integer status);
+
+    /**
      * 套餐分页查询
      *
      * @param setmealPageQueryDTO

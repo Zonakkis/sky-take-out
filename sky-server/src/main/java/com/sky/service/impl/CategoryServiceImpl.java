@@ -62,6 +62,23 @@ public class CategoryServiceImpl implements CategoryService {
     }
 
     /**
+     * 根据类型查询分类列表
+     *
+     * @param type
+     * @return
+     */
+    public List<CategoryVO> list(Integer type) {
+        List<Category> categories = categoryMapper.list(type);
+        List<CategoryVO> list = categories
+                .stream().map(category -> {
+                    CategoryVO categoryVO = new CategoryVO();
+                    BeanUtils.copyProperties(category, categoryVO);
+                    return categoryVO;
+                }).collect(Collectors.toList());
+        return list;
+    }
+
+    /**
      * 分类分页查询
      *
      * @param categoryPageQueryDTO
@@ -121,22 +138,5 @@ public class CategoryServiceImpl implements CategoryService {
             throw new DeletionNotAllowedException(MessageConstant.CATEGORY_BE_RELATED_BY_DISH);
         }
         categoryMapper.deleteById(id);
-    }
-
-    /**
-     * 根据类型查询分类列表
-     *
-     * @param type
-     * @return
-     */
-    public List<CategoryVO> listByType(Integer type) {
-        List<Category> categories = categoryMapper.listByType(type);
-        List<CategoryVO> list = categories
-                .stream().map(category -> {
-                    CategoryVO categoryVO = new CategoryVO();
-                    BeanUtils.copyProperties(category, categoryVO);
-                    return categoryVO;
-                }).collect(Collectors.toList());
-        return list;
     }
 }

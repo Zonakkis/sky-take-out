@@ -45,6 +45,13 @@ public interface CategoryMapper {
      */
     List<Category> getByIds(List<Long> ids);
 
+    /**
+     * 根据类型查询分类列表
+     *
+     * @param type
+     * @return
+     */
+    List<Category> list(Integer type);
 
     /**
      * 分类分页查询
@@ -70,12 +77,4 @@ public interface CategoryMapper {
     @Delete("delete from category where id = #{id}")
     void deleteById(Long id);
 
-    /**
-     * 根据类型查询分类列表
-     *
-     * @param type
-     * @return
-     */
-    @Select("select * from category where type = #{type} order by sort")
-    List<Category> listByType(Integer type);
 }

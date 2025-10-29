@@ -46,7 +46,7 @@ public class DishController {
      */
     @GetMapping("/{id}")
     @ApiOperation("查询菜品信息")
-    public Result<DishVO> getById(@PathVariable Integer id) {
+    public Result<DishVO> getById(@PathVariable Long id) {
         log.info("查询菜品信息：{}", id);
         DishVO dishVO = dishService.getWithFlavorsById(id);
         return Result.success(dishVO);
@@ -60,7 +60,7 @@ public class DishController {
      */
     @GetMapping("/list")
     @ApiOperation("查询菜品列表")
-    public Result<List<DishVO>> list(Integer categoryId) {
+    public Result<List<DishVO>> list(Long categoryId) {
         log.info("查询菜品列表：{}", categoryId);
         List<DishVO> dishVOS = dishService.listByCategoryId(categoryId);
         return Result.success(dishVOS);

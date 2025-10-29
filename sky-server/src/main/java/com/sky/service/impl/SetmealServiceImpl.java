@@ -75,6 +75,26 @@ public class SetmealServiceImpl implements SetmealService {
     }
 
     /**
+     * 根据分类id和状态查询套餐列表
+     *
+     * @param categoryId
+     * @param status
+     * @return
+     */
+    public List<SetmealVO> listByCategoryId(Long categoryId, Integer status) {
+        List<Setmeal> setmeals = setmealMapper.listByCategoryId(categoryId, status);
+
+        // 封装VO
+        List<SetmealVO> setmealVOS = setmeals.stream().map(setmeal -> {
+            SetmealVO setmealVO = new SetmealVO();
+            BeanUtils.copyProperties(setmeal, setmealVO);
+            return setmealVO;
+        }).collect(Collectors.toList());
+
+        return setmealVOS;
+    }
+
+    /**
      * 套餐分页查询
      *
      * @param setmealPageQueryDTO

@@ -6,16 +6,12 @@ import com.sky.constant.MessageConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.dto.DishDTO;
 import com.sky.dto.DishPageQueryDTO;
-import com.sky.entity.Category;
-import com.sky.entity.Dish;
-import com.sky.entity.DishFlavor;
+import com.sky.entity.*;
 import com.sky.exception.DeletionNotAllowedException;
-import com.sky.mapper.CategoryMapper;
-import com.sky.mapper.DishFlavorMapper;
-import com.sky.mapper.DishMapper;
-import com.sky.mapper.SetmealDishMapper;
+import com.sky.mapper.*;
 import com.sky.result.PageResult;
 import com.sky.service.DishService;
+import com.sky.vo.DishItemVO;
 import com.sky.vo.DishVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,6 +34,8 @@ public class DishServiceImpl implements DishService {
     private DishFlavorMapper dishFlavorMapper;
     @Autowired
     private SetmealDishMapper setmealDishMapper;
+    @Autowired
+    private SetmealMapper setmealMapper;
 
     /**
      * 新增菜品，同时保存对应的口味
@@ -74,7 +72,7 @@ public class DishServiceImpl implements DishService {
      * @param id
      * @return
      */
-    public DishVO getWithFlavorsById(Integer id) {
+    public DishVO getWithFlavorsById(Long id) {
         Dish dish = dishMapper.getById(id);
 
         DishVO dishVO = new DishVO();
@@ -91,13 +89,53 @@ public class DishServiceImpl implements DishService {
      * @param categoryId
      * @return
      */
-    public List<DishVO> listByCategoryId(Integer categoryId) {
-        List<Dish> dishes = dishMapper.listByCategoryId(categoryId);
+    public List<DishVO> listByCategoryId(Long categoryId) {
+        List<Dish> dishes = dishMapper.listByCategoryId(categoryId, null);
 
         return dishes.stream().map(dish -> {
             DishVO dishVO = new DishVO();
             BeanUtils.copyProperties(dish, dishVO);
             return dishVO;
+        }).collect(Collectors.toList());
+    }
+
+    /**
+     * 根据分类id查询菜品及其口味列表
+     *
+     * @param categoryId
+     * @param status
+     * @return
+     */
+    public List<DishVO> listWithFlavorsByCategoryId(Long categoryId, Integer status) {
+        List<Dish> dishes = dishMapper.listByCategoryId(categoryId, StatusConstant.ENABLE);
+
+        return dishes.stream().map(dish -> {
+            DishVO dishVO = new DishVO();
+            BeanUtils.copyProperties(dish, dishVO);
+
+            List<DishFlavor> flavors = dishFlavorMapper.listByDishId(dish.getId());
+            dishVO.setFlavors(flavors);
+            return dishVO;
+        }).collect(Collectors.toList());
+    }
+
+
+    public List<DishItemVO> listBySetmealId(Long setmealId) {
+        List<SetmealDish> setmealDishes = setmealDishMapper.getBySetmealId(setmealId);
+        Map<Long, SetmealDish> setmealDishMap = setmealDishes.stream()
+                .collect(Collectors.toMap(SetmealDish::getDishId, sd -> sd));
+        List<Long> dishIds = setmealDishes.stream()
+                .map(SetmealDish::getDishId)
+                .collect(Collectors.toList());
+        List<Dish> dishes = dishMapper.listByIds(dishIds);
+        return dishes.stream().map(dish -> {
+            SetmealDish setmealDish = setmealDishMap.get(dish.getId());
+            return DishItemVO.builder()
+                    .name(setmealDish.getName())
+                    .copies(setmealDish.getCopies())
+                    .image(dish.getImage())
+                    .description(dish.getDescription())
+                    .build();
         }).collect(Collectors.toList());
     }
 
@@ -188,7 +226,7 @@ public class DishServiceImpl implements DishService {
             return;
         }
         // 检查菜品状态，确保没有在售的菜品被删除
-        List<Dish> dishes = dishMapper.getByIds(ids);
+        List<Dish> dishes = dishMapper.listByIds(ids);
         for (Dish dish : dishes) {
             if (Objects.equals(dish.getStatus(), StatusConstant.ENABLE)) {
                 throw new DeletionNotAllowedException(MessageConstant.DISH_ON_SALE);
