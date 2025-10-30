@@ -19,7 +19,7 @@ public class ShopServiceImpl implements ShopService {
      * @return
      */
     public Integer getStatus() {
-        return (Integer) redisTemplate.opsForValue().get(RedisKeyConstant.SHOP_STATUS_KEY);
+        return (Integer) redisTemplate.opsForValue().get(RedisKeyConstant.SHOP_STATUS);
     }
 
     /**
@@ -28,6 +28,6 @@ public class ShopServiceImpl implements ShopService {
      * @param status
      */
     public void setStatus(Long status) {
-        redisTemplate.opsForValue().set(RedisKeyConstant.SHOP_STATUS_KEY, status);
+        redisTemplate.opsForValue().set(RedisKeyConstant.SHOP_STATUS, status);
     }
 }
