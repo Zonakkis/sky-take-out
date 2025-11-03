@@ -16,6 +16,8 @@ import com.sky.vo.DishItemVO;
 import com.sky.vo.DishVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -29,8 +31,6 @@ import java.util.stream.Collectors;
 @Service
 public class DishServiceImpl implements DishService {
 
-    @Autowired
-    private RedisTemplate<String, Object> redisTemplate;
     @Autowired
     private CategoryMapper categoryMapper;
     @Autowired
@@ -46,6 +46,8 @@ public class DishServiceImpl implements DishService {
      * @param dishDTO
      */
     @Transactional
+    @CacheEvict(cacheNames = RedisKeyConstant.DISH,
+            key = "T(com.sky.constant.RedisKeyConstant).CATEGORY + #result.categoryId")
     public void createWithFalvors(DishDTO dishDTO) {
         Dish dish = new Dish();
         BeanUtils.copyProperties(dishDTO, dish);
@@ -64,11 +66,6 @@ public class DishServiceImpl implements DishService {
             }
             dishFlavorMapper.insertBatch(flavors);
         }
-
-        // 清除分类下的菜品缓存
-        String key = RedisKeyConstant.DISHES_CATEGORY + dish.getCategoryId();
-        clearCache(key);
-
     }
 
 
@@ -112,16 +109,12 @@ public class DishServiceImpl implements DishService {
      * @param status
      * @return
      */
+    @Cacheable(cacheNames = RedisKeyConstant.DISH,
+            key = "T(com.sky.constant.RedisKeyConstant).CATEGORY + #categoryId")
     public List<DishVO> listWithFlavorsByCategoryId(Long categoryId, Integer status) {
-        String key = RedisKeyConstant.DISHES_CATEGORY + categoryId;
-        List<DishVO> dishVOS = (List<DishVO>) redisTemplate.opsForValue().get(key);
-        if (dishVOS != null) {
-            return dishVOS;
-        }
-
         List<Dish> dishes = dishMapper.listByCategoryId(categoryId, StatusConstant.ENABLE);
 
-        dishVOS = dishes.stream().map(dish -> {
+        List<DishVO> dishVOS = dishes.stream().map(dish -> {
             DishVO dishVO = new DishVO();
             BeanUtils.copyProperties(dish, dishVO);
 
@@ -129,7 +122,6 @@ public class DishServiceImpl implements DishService {
             dishVO.setFlavors(flavors);
             return dishVO;
         }).collect(Collectors.toList());
-        redisTemplate.opsForValue().set(key, dishVOS);
         return dishVOS;
     }
 
@@ -212,6 +204,9 @@ public class DishServiceImpl implements DishService {
      * @param dishDTO
      */
     @Transactional
+    @CacheEvict(cacheNames = RedisKeyConstant.DISH,
+            key = "T(com.sky.constant.RedisKeyConstant).CATEGORY",
+            allEntries = true)
     public void update(DishDTO dishDTO) {
         // 更新菜品信息
         Dish dish = new Dish();
@@ -227,10 +222,6 @@ public class DishServiceImpl implements DishService {
             }
             dishFlavorMapper.insertBatch(flavors);
         }
-
-        // 清除分类下的菜品缓存
-        String key = RedisKeyConstant.DISHES_CATEGORY + "*";
-        clearCache(key);
     }
 
     /**
@@ -239,6 +230,9 @@ public class DishServiceImpl implements DishService {
      * @param ids
      */
     @Transactional
+    @CacheEvict(cacheNames = RedisKeyConstant.DISH,
+            key = "T(com.sky.constant.RedisKeyConstant).CATEGORY",
+            allEntries = true)
     public void deleteByIds(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return;
@@ -262,13 +256,5 @@ public class DishServiceImpl implements DishService {
         // 删除菜品
         dishMapper.deleteByIds(ids);
 
-        // 清除分类菜品缓存
-        String key = RedisKeyConstant.DISHES_CATEGORY + "*";
-        clearCache(key);
-    }
-
-    private void clearCache(String key) {
-        Set<String> keys = redisTemplate.keys(key);
-        redisTemplate.delete(keys);
     }
 }

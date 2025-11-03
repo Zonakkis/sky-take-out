@@ -2,6 +2,7 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.RedisKeyConstant;
 import com.sky.constant.StatusConstant;
 import com.sky.dto.SetmealDTO;
 import com.sky.dto.SetmealPageQueryDTO;
@@ -15,6 +16,8 @@ import com.sky.service.SetmealService;
 import com.sky.vo.SetmealVO;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.annotation.CacheEvict;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -81,6 +84,8 @@ public class SetmealServiceImpl implements SetmealService {
      * @param status
      * @return
      */
+    @Cacheable(cacheNames = RedisKeyConstant.SETMEAL,
+            key = "T(com.sky.constant.RedisKeyConstant).CATEGORY + #categoryId")
     public List<SetmealVO> listByCategoryId(Long categoryId, Integer status) {
         List<Setmeal> setmeals = setmealMapper.listByCategoryId(categoryId, status);
 
@@ -127,6 +132,7 @@ public class SetmealServiceImpl implements SetmealService {
      * @param id
      * @param status
      */
+    @CacheEvict(value = RedisKeyConstant.SETMEAL, allEntries = true)
     public void setStatus(Long id, Integer status) {
         Setmeal setmeal = new Setmeal();
         setmeal.setId(id);
@@ -162,6 +168,7 @@ public class SetmealServiceImpl implements SetmealService {
      *
      * @param ids
      */
+    @CacheEvict(value = RedisKeyConstant.SETMEAL, allEntries = true)
     public void deleteByIds(List<Long> ids) {
         if (ids == null || ids.isEmpty()) {
             return;
