@@ -2,6 +2,9 @@ server:
   port: 8080
 
 spring:
+  config:
+    import:
+      - order.yml
   profiles:
     active: dev
   main:
