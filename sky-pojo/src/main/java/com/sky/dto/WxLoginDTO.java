@@ -3,7 +3,7 @@ package com.sky.dto;
 import lombok.Data;
 
 @Data
-public class WXLoginDTO {
+public class WxLoginDTO {
     private String sessionKey;
     private String unionId;
     private String errMsg;

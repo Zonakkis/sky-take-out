@@ -5,19 +5,18 @@ import com.sky.constant.JwtClaimsConstant;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.UrlConstant;
 import com.sky.dto.UserLoginDTO;
-import com.sky.dto.WXLoginDTO;
+import com.sky.dto.WxLoginDTO;
 import com.sky.entity.User;
 import com.sky.enumeration.JwtType;
 import com.sky.exception.LoginFailedException;
 import com.sky.mapper.UserMapper;
 import com.sky.properties.WeChatProperties;
+import com.sky.service.HttpService;
 import com.sky.service.JwtService;
 import com.sky.service.UserService;
-import com.sky.utils.HttpClientUtil;
 import com.sky.vo.UserLoginVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import springfox.documentation.annotations.ApiIgnore;
 
 import java.time.LocalDateTime;
 import java.util.HashMap;
@@ -28,6 +27,8 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     private JwtService jwtService;
+    @Autowired
+    private HttpService httpService;
     @Autowired
     private UserMapper userMapper;
     @Autowired
@@ -78,8 +79,7 @@ public class UserServiceImpl implements UserService {
         params.put("secret", weChatProperties.getSecret());
         params.put("js_code", code);
         params.put("grant_type", "authorization_code");
-        String json = HttpClientUtil.doGet(UrlConstant.WX_LOGIN, params);
-        WXLoginDTO wxLoginDTO = JSON.parseObject(json, WXLoginDTO.class);
+        WxLoginDTO wxLoginDTO = httpService.get(UrlConstant.WX_LOGIN, params, WxLoginDTO.class);
         return wxLoginDTO.getOpenId();
     }
 }
