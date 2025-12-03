@@ -9,4 +9,8 @@ public class UrlConstant {
     public static final String WX_PAY_JSAPI_MOCK = "http://localhost:8080/wx/pay/transactions/jsapi";
     //申请退款接口地址
     public static final String WX_PAY_REFUNDS = "https://api.mch.weixin.qq.com/v3/refund/domestic/refunds";
+    // 百度地图地理编码接口地址
+    public static final String BAIDU_MAP_GEOCODING = "http://api.map.baidu.com/geocoding/v3/";
+    // 百度地图轻量级路线规划接口地址
+    public static final String BAIDU_MAP_DIRECTION_LITE = "https://api.map.baidu.com/directionlite/v1/driving";
 }

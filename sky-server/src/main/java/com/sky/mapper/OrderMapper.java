@@ -1,6 +1,8 @@
 package com.sky.mapper;
 
-import com.sky.entity.Orders;
+import com.github.pagehelper.Page;
+import com.sky.dto.OrderPageQueryDTO;
+import com.sky.entity.Order;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
@@ -11,9 +13,9 @@ public interface OrderMapper {
     /**
      * 插入订单
      *
-     * @param orders
+     * @param order
      */
-    @Insert("insert into orders " +
+    @Insert("insert into `order` " +
             " (number, status, user_id, address_book_id, order_time, checkout_time, " +
             "pay_method, pay_status, amount, remark, phone, address, user_name, consignee, " +
             "cancel_reason, rejection_reason, cancel_time, estimated_delivery_time, " +
@@ -24,10 +26,33 @@ public interface OrderMapper {
             " #{cancelReason}, #{rejectionReason}, #{cancelTime}, #{estimatedDeliveryTime}, " +
             "#{deliveryStatus}, #{deliveryTime}, #{packAmount}, #{tablewareNumber}, #{tablewareStatus})")
     @Options(useGeneratedKeys = true, keyProperty = "id")
-    void insert(Orders orders);
+    void insert(Order order);
 
     /**
-     * 通过订单号查询订单
+     * 根据订单状态查询订单数量
+     *
+     * @param status
+     * @return
+     */
+    @Select("select count(*) from `order` where status = #{status}")
+    Integer countByStatus(Integer status);
+
+
+    /**
+     * 根据id查询订单
+     *
+     * @param id
+     * @return
+     */
+    @Select("select id, number, status, user_id, address_book_id, order_time, checkout_time, " +
+            "pay_method, pay_status, amount, remark, phone, address, user_name, consignee, " +
+            "cancel_reason, rejection_reason, cancel_time, estimated_delivery_time, " +
+            "delivery_status, delivery_time, pack_amount, tableware_number, tableware_status " +
+            "from `order` where id = #{id}")
+    Order getById(Long id);
+
+    /**
+     * 根据订单号查询订单
      *
      * @param number
      * @return
@@ -36,13 +61,21 @@ public interface OrderMapper {
             "pay_method, pay_status, amount, remark, phone, address, user_name, consignee, " +
             "cancel_reason, rejection_reason, cancel_time, estimated_delivery_time, " +
             "delivery_status, delivery_time, pack_amount, tableware_number, tableware_status " +
-            "from orders where number = #{number}")
-    Orders getByNumber(String number);
+            "from `order` where number = #{number}")
+    Order getByNumber(String number);
+
+    /**
+     * 订单分页查询
+     *
+     * @param orderPageQueryDTO
+     * @return
+     */
+    Page<Order> pageQuery(OrderPageQueryDTO orderPageQueryDTO);
 
     /**
      * 更新订单
      *
-     * @param orders
+     * @param order
      */
-    void update(Orders orders);
+    void update(Order order);
 }

@@ -1,13 +1,10 @@
 package com.sky.config;
 
 import com.aliyun.oss.ClientBuilderConfiguration;
-import com.aliyun.oss.ClientConfiguration;
 import com.aliyun.oss.OSS;
 import com.aliyun.oss.OSSClientBuilder;
-import com.aliyun.oss.common.auth.CredentialsProviderFactory;
-import com.aliyun.oss.common.auth.EnvironmentVariableCredentialsProvider;
+import com.aliyun.oss.common.auth.DefaultCredentialProvider;
 import com.aliyun.oss.common.comm.SignVersion;
-import com.aliyuncs.exceptions.ClientException;
 import com.qiniu.storage.Region;
 import com.qiniu.storage.UploadManager;
 import com.sky.properties.AliyunOssProperties;
@@ -19,22 +16,20 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-public class OssConfiguration {
+public class OssServiceConfiguration {
 
     @Bean
     @ConditionalOnBean(AliyunOssServiceImpl.class)
-    public OSS ossClient(AliyunOssProperties aliyunOssProperties) throws ClientException {
-        // 从环境变量中获取访问凭证。
-        EnvironmentVariableCredentialsProvider credentialsProvider =
-                CredentialsProviderFactory.newEnvironmentVariableCredentialsProvider();
-        ClientConfiguration clientConfiguration = new ClientConfiguration();
-        clientConfiguration.setSignatureVersion(SignVersion.V4);
+    public OSS ossClient(AliyunOssProperties aliyunOssProperties) {
+        DefaultCredentialProvider credentialProvider = new DefaultCredentialProvider(
+                aliyunOssProperties.getAccessKeyId(),
+                aliyunOssProperties.getAccessKeySecret());
         // 创建OSSClient实例。
         ClientBuilderConfiguration clientBuilderConfiguration = new ClientBuilderConfiguration();
         clientBuilderConfiguration.setSignatureVersion(SignVersion.V4);
         return OSSClientBuilder.create()
                 .endpoint(aliyunOssProperties.getEndpoint())
-                .credentialsProvider(credentialsProvider)
+                .credentialsProvider(credentialProvider)
                 .clientConfiguration(clientBuilderConfiguration)
                 .region(aliyunOssProperties.getRegion())
                 .build();

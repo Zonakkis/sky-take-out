@@ -12,7 +12,7 @@ public class OrderConstant {
         public static final Integer DELIVERY_IN_PROGRESS = 4;
         // 5 已完成
         public static final Integer COMPLETED = 5;
-        //  6 已取消
+        // 6 已取消
         public static final Integer CANCELLED = 6;
     }
 

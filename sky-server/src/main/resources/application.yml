@@ -5,6 +5,7 @@ spring:
   config:
     import:
       - order.yml
+      - shop.yml
   profiles:
     active: dev
   main:
@@ -70,5 +71,9 @@ sky:
     we-chat-pay-cert-file-path: ${sky.wechat.we-chat-pay-cert-file-path}
     notify-url: ${sky.wechat.notify-url}
     refund-notify-url: ${sky.wechat.refund-notify-url}
+  baidu:
+    map:
+      ak: ${sky.baidu.map.ak}
+      sk: ${sky.baidu.map.sk}
 
 

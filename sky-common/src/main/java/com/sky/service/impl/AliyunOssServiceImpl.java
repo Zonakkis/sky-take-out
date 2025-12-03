@@ -8,6 +8,7 @@ import com.sky.service.OssService;
 import com.sky.utils.FileUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.PreDestroy;
@@ -16,6 +17,7 @@ import java.util.UUID;
 
 @Service
 @Slf4j
+@Primary
 public class AliyunOssServiceImpl implements OssService {
 
     @Autowired

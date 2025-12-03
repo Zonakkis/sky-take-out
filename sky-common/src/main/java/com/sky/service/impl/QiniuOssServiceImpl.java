@@ -16,7 +16,6 @@ import java.util.UUID;
 
 @Slf4j
 @Service
-@Primary
 public class QiniuOssServiceImpl implements OssService {
 
     @Autowired
