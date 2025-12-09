@@ -30,6 +30,13 @@ mybatis:
     #开启驼峰命名
     map-underscore-to-camel-case: true
 
+rocketmq:
+  name-server: ${sky.rocketmq.name-server}
+  producer:
+
+    group: ${sky.rocketmq.producer.group}
+    send-message-timeout: ${sky.rocketmq.producer.send-message-timeout}
+
 logging:
   level:
     com:

@@ -2,6 +2,8 @@ package com.sky.service.impl;
 
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
+import com.sky.constant.MQTagConstant;
+import com.sky.constant.MQTopicConstant;
 import com.sky.constant.MessageConstant;
 import com.sky.constant.OrderConstant;
 import com.sky.context.BaseContext;
@@ -18,6 +20,7 @@ import com.sky.properties.OrderProperties;
 import com.sky.properties.ShopProperties;
 import com.sky.result.PageResult;
 import com.sky.service.BaiduMapService;
+import com.sky.service.MQProducer;
 import com.sky.service.OrderService;
 import com.sky.service.WeChatService;
 import com.sky.vo.*;
@@ -29,10 +32,8 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Service
@@ -57,6 +58,8 @@ public class OrderServiceImpl implements OrderService {
     private WeChatService weChatService;
     @Autowired
     private BaiduMapService baiduMapService;
+    @Autowired
+    private MQProducer mqProducer;
 
     /**
      * 订单分页查询
@@ -160,7 +163,7 @@ public class OrderServiceImpl implements OrderService {
     public OrderStatisticsVO statistics() {
         Integer toBeConfirmedCount = orderMapper.countByStatus(OrderConstant.Status.TO_BE_CONFIRMED);
         Integer confirmedCount = orderMapper.countByStatus(OrderConstant.Status.CONFIRMED);
-        Integer deliveryInProgressCount = orderMapper.countByStatus(OrderConstant.Status.DELIVERY_IN_PROGRESS);
+        Integer deliveryInProgressCount = orderMapper.countByStatus(OrderConstant.Status.DELIVERING);
 
         // 封装OrderStatisticsVO
         OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();
@@ -194,12 +197,13 @@ public class OrderServiceImpl implements OrderService {
             BaiduMapDirectionLiteDTO directionLiteDTO =
                     baiduMapService.directionLite(userLocation, shopLocation);
             Integer distance = directionLiteDTO.getResult().getRoutes()[0].getDistance();
-            if(distance > shopProperties.getDeliveryRange()){
+            if (distance > shopProperties.getDeliveryRange()) {
+                log.info("超出配送范围，目标地址：{}，距离：{}米", addressBook.getDetail(), distance);
                 throw new OrderBusinessException(MessageConstant.OUT_OF_DELIVERY_RANGE);
             }
         } catch (OrderBusinessException e) {
             throw e;
-        } catch (Exception e){
+        } catch (Exception e) {
             log.error("检查配送范围失败：{}", e.getMessage());
             throw new OrderBusinessException(MessageConstant.SERVER_ERROR);
         }
@@ -229,6 +233,15 @@ public class OrderServiceImpl implements OrderService {
         order.setPhone(addressBook.getPhone());
         order.setAddress(addressBook.getDetail());
         orderMapper.insert(order);
+
+        // 发送订单超时取消消息
+        try {
+            mqProducer.sendDelay(MQTopicConstant.ORDER, MQTagConstant.CANCEL,
+                    order.getId(), orderProperties.getTimeOutMinutes(), TimeUnit.MINUTES);
+        } catch (Exception e) {
+            log.error("订单超时取消消息发送失败：{}", e.getMessage());
+            throw new OrderBusinessException(MessageConstant.SERVER_ERROR);
+        }
 
         // 创建订单明细
         BigDecimal packagingFee = new BigDecimal(0);
@@ -313,7 +326,7 @@ public class OrderServiceImpl implements OrderService {
     public void delivery(Long id) {
         Order order = new Order();
         order.setId(id);
-        order.setStatus(OrderConstant.Status.DELIVERY_IN_PROGRESS);
+        order.setStatus(OrderConstant.Status.DELIVERING);
         orderMapper.update(order);
     }
 
@@ -345,17 +358,29 @@ public class OrderServiceImpl implements OrderService {
     }
 
     /**
+     * 取消订单
+     *
+     * @param id
+     * @param reason
+     */
+    public void cancel(Long id, String reason) {
+        Order order = orderMapper.getById(id);
+        if (Objects.equals(order.getStatus(), OrderConstant.Status.CANCELLED)) {
+            return;
+        }
+        order.setStatus(OrderConstant.Status.CANCELLED);
+        order.setCancelReason(reason);
+        order.setCancelTime(LocalDateTime.now());
+        orderMapper.update(order);
+    }
+
+    /**
      * 商家取消订单
      *
      * @param orderCancelDTO
      */
     public void cancelByShop(OrderCancelDTO orderCancelDTO) {
-        Order order = new Order();
-        order.setId(orderCancelDTO.getId());
-        order.setStatus(OrderConstant.Status.CANCELLED);
-        order.setCancelReason(orderCancelDTO.getCancelReason());
-        order.setCancelTime(LocalDateTime.now());
-        orderMapper.update(order);
+        cancel(orderCancelDTO.getId(), orderCancelDTO.getCancelReason());
     }
 
     /**
@@ -364,12 +389,7 @@ public class OrderServiceImpl implements OrderService {
      * @param id
      */
     public void cancelByUser(Long id) {
-        Order order = new Order();
-        order.setId(id);
-        order.setStatus(OrderConstant.Status.CANCELLED);
-        order.setCancelReason("用户取消订单");
-        order.setCancelTime(LocalDateTime.now());
-        orderMapper.update(order);
+        cancel(id, OrderConstant.CancelReason.USER_CANCELLED);
     }
 
 

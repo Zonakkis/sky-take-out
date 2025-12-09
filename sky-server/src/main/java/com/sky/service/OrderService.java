@@ -87,6 +87,15 @@ public interface OrderService {
      */
     void reject(OrderRejectDTO orderRejectDTO);
 
+
+    /**
+     * 取消订单
+     *
+     * @param id
+     * @param reason
+     */
+    void cancel(Long id, String reason);
+
     /**
      * 商家取消订单
      *

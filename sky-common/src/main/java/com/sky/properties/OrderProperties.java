@@ -10,6 +10,7 @@ import java.math.BigDecimal;
 @ConfigurationProperties("sky.order")
 @Data
 public class OrderProperties {
+    private int timeOutMinutes;
     private BigDecimal packagingFeeCoefficient;
     private BigDecimal deliveryFee;
 

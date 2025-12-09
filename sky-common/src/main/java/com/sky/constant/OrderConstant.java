@@ -9,7 +9,7 @@ public class OrderConstant {
         // 3 已接单
         public static final Integer CONFIRMED = 3;
         // 4 派送中
-        public static final Integer DELIVERY_IN_PROGRESS = 4;
+        public static final Integer DELIVERING = 4;
         // 5 已完成
         public static final Integer COMPLETED = 5;
         // 6 已取消
@@ -23,5 +23,10 @@ public class OrderConstant {
         public static final Integer PAID = 1;
         // 2 退款
         public static final Integer REFUND = 2;
+    }
+
+    public static class CancelReason {
+        public static final String USER_CANCELLED = "用户取消订单";
+        public static final String TIMEOUT = "订单超时未支付";
     }
 }

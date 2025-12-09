@@ -1,4 +1,5 @@
 sky:
   order:
+    time-out-minutes: 15
     packaging-fee-coefficient: 1
     delivery-fee: 6

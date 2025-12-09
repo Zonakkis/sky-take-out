@@ -8,6 +8,8 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
+import java.util.List;
+
 @Mapper
 public interface OrderMapper {
     /**
@@ -63,6 +65,19 @@ public interface OrderMapper {
             "delivery_status, delivery_time, pack_amount, tableware_number, tableware_status " +
             "from `order` where number = #{number}")
     Order getByNumber(String number);
+
+    /**
+     * 根据订单状态查询订单列表
+     *
+     * @param status
+     * @return
+     */
+    @Select("select id, number, status, user_id, address_book_id, order_time, checkout_time, " +
+            "pay_method, pay_status, amount, remark, phone, address, user_name, consignee, " +
+            "cancel_reason, rejection_reason, cancel_time, estimated_delivery_time, " +
+            "delivery_status, delivery_time, pack_amount, tableware_number, tableware_status " +
+            "from `order` where status = #{status}")
+    List<Order> listByStatus(Integer status);
 
     /**
      * 订单分页查询
