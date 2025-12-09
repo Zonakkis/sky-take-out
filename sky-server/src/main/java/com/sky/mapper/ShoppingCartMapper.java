@@ -23,6 +23,13 @@ public interface ShoppingCartMapper {
     void insert(ShoppingCart shoppingCart);
 
     /**
+     * 批量插入购物车
+     *
+     * @param shoppingCarts
+     */
+    void insertBatch(List<ShoppingCart> shoppingCarts);
+
+    /**
      * 查询购物车列表
      *
      * @param shoppingCart

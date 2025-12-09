@@ -288,22 +288,18 @@ public class OrderServiceImpl implements OrderService {
         if (!order.getUserId().equals(userId)) {
             throw new OrderBusinessException(MessageConstant.USER_NOT_MATCH);
         }
-        order.setId(null);
-        // 设置订单时间
-        order.setOrderTime(LocalDateTime.now());
-        // 订单默认状态为待支付
-        order.setStatus(OrderConstant.Status.PENDING_PAYMENT);
-        // 订单支付状态为未支付
-        order.setPayStatus(OrderConstant.PayStatus.UNPAID);
-        // 生成订单号
-        order.setNumber(UUID.randomUUID().toString());
-        orderMapper.insert(order);
-        List<OrderDetail> orderDetails = orderDetailMapper.getByOrderId(id)
-                .stream().peek(detail -> {
-                    detail.setId(null);
-                    detail.setOrderId(order.getId());
-                }).collect(Collectors.toList());
-        orderDetailMapper.insertBatch(orderDetails);
+        List<OrderDetail> orderDetails = orderDetailMapper.getByOrderId(id);
+        if (orderDetails == null || orderDetails.isEmpty()) {
+            return;
+        }
+        List<ShoppingCart> shoppingCarts = orderDetails.stream().map(orderDetail -> {
+            ShoppingCart shoppingCart = new ShoppingCart();
+            BeanUtils.copyProperties(orderDetail, shoppingCart, "id");
+            shoppingCart.setUserId(userId);
+            shoppingCart.setCreateTime(LocalDateTime.now());
+            return shoppingCart;
+        }).collect(Collectors.toList());
+        shoppingCartMapper.insertBatch(shoppingCarts);
     }
 
 
