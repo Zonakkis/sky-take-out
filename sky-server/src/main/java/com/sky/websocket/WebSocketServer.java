@@ -1,5 +1,6 @@
 package com.sky.websocket;
 
+import com.alibaba.fastjson2.JSON;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -47,5 +48,10 @@ public class WebSocketServer {
                 log.error("向客户端 {} 发送消息失败: {}", sid, e.getMessage());
             }
         }
+    }
+
+    public void sendToAll(Object message) {
+        String json = JSON.toJSONString(message);
+        sendToAll(json);
     }
 }

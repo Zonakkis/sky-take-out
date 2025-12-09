@@ -22,6 +22,7 @@
                 and status = #{status}
             </if>
         </where>
+        order by order_time desc
     </select>
     <update id="update" parameterType="com.sky.entity.Order">
         update `order`

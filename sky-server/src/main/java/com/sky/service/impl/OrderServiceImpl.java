@@ -302,6 +302,31 @@ public class OrderServiceImpl implements OrderService {
         shoppingCartMapper.insertBatch(shoppingCarts);
     }
 
+    /**
+     * 用户催单
+     *
+     * @param id 订单ID
+     */
+    public void reminder(Long id) {
+        Long userId = BaseContext.getCurrentId();
+        Order order = orderMapper.getById(id);
+        if (order == null) { // 订单不存在
+            throw new OrderBusinessException(MessageConstant.ORDER_NOT_FOUND);
+        } else if (!order.getUserId().equals(userId)) { // 订单不属于当前用户
+            throw new OrderBusinessException(MessageConstant.USER_NOT_MATCH);
+        } else if (order.getPayStatus().equals(OrderConstant.PayStatus.UNPAID) // 订单未支付
+                || order.getStatus().equals(OrderConstant.Status.CANCELLED) // 订单已取消
+                || order.getStatus().equals(OrderConstant.Status.COMPLETED)) { // 订单已完成
+            throw new OrderBusinessException(MessageConstant.ORDER_STATUS_ERROR);
+        }
+
+        OrderMessageDTO orderMessageDTO = new OrderMessageDTO();
+        orderMessageDTO.setType(OrderMessageType.REMINDER);
+        orderMessageDTO.setOrderId(id);
+        orderMessageDTO.setContent("订单号：" + order.getNumber());
+        webSocketServer.sendToAll(orderMessageDTO);
+    }
+
 
     /**
      * 接单
@@ -446,7 +471,7 @@ public class OrderServiceImpl implements OrderService {
 
         OrderMessageDTO orderMessageDTO = new OrderMessageDTO();
         orderMessageDTO.setType(OrderMessageType.NEW_ORDER);
-        orderMessageDTO.setOrderId(outTradeNo);
+        orderMessageDTO.setOrderId(order.getId());
         orderMessageDTO.setContent("订单号：" + outTradeNo);
 
         String json = JSON.toJSONString(orderMessageDTO);

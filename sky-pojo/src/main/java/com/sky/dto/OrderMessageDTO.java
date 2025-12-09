@@ -5,6 +5,6 @@ import lombok.Data;
 @Data
 public class OrderMessageDTO {
     private int type;
-    private String orderId;
+    private long orderId;
     private String content;
 }
