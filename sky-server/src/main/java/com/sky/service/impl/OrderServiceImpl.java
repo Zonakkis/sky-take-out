@@ -1,11 +1,9 @@
 package com.sky.service.impl;
 
+import com.alibaba.fastjson2.JSON;
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
-import com.sky.constant.MQTagConstant;
-import com.sky.constant.MQTopicConstant;
-import com.sky.constant.MessageConstant;
-import com.sky.constant.OrderConstant;
+import com.sky.constant.*;
 import com.sky.context.BaseContext;
 import com.sky.dto.*;
 import com.sky.dto.baidu.map.BaiduMapDirectionLiteDTO;
@@ -24,6 +22,7 @@ import com.sky.service.MQProducer;
 import com.sky.service.OrderService;
 import com.sky.service.WeChatService;
 import com.sky.vo.*;
+import com.sky.websocket.WebSocketServer;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -60,6 +59,8 @@ public class OrderServiceImpl implements OrderService {
     private BaiduMapService baiduMapService;
     @Autowired
     private MQProducer mqProducer;
+    @Autowired
+    private WebSocketServer webSocketServer;
 
     /**
      * 订单分页查询
@@ -446,6 +447,14 @@ public class OrderServiceImpl implements OrderService {
                 .build();
 
         orderMapper.update(order);
+
+        OrderMessageDTO orderMessageDTO = new OrderMessageDTO();
+        orderMessageDTO.setType(OrderMessageType.NEW_ORDER);
+        orderMessageDTO.setOrderId(outTradeNo);
+        orderMessageDTO.setContent("订单号：" + outTradeNo);
+
+        String json = JSON.toJSONString(orderMessageDTO);
+        webSocketServer.sendToAll(json);
     }
 
     /**
