@@ -24,13 +24,6 @@
         </where>
         order by order_time desc
     </select>
-    <select id="sumByDateBetween" resultType="com.sky.dto.DateSumDTO">
-        select coalesce(sum(amount), 0) as total, date(order_time) as date
-        from `order`
-        where order_time between #{begin} and #{end}
-        group by date(order_time)
-        order by date(order_time)
-    </select>
     <update id="update" parameterType="com.sky.entity.Order">
         update `order`
         <set>
