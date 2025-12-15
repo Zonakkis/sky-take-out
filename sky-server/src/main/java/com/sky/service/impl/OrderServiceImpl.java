@@ -162,9 +162,9 @@ public class OrderServiceImpl implements OrderService {
      * @return
      */
     public OrderStatisticsVO statistics() {
-        Integer toBeConfirmedCount = orderMapper.countByStatus(OrderConstant.Status.TO_BE_CONFIRMED);
-        Integer confirmedCount = orderMapper.countByStatus(OrderConstant.Status.CONFIRMED);
-        Integer deliveryInProgressCount = orderMapper.countByStatus(OrderConstant.Status.DELIVERING);
+        Integer toBeConfirmedCount = orderMapper.count(OrderConstant.Status.TO_BE_CONFIRMED, null, null);
+        Integer confirmedCount = orderMapper.count(OrderConstant.Status.CONFIRMED, null, null);
+        Integer deliveryInProgressCount = orderMapper.count(OrderConstant.Status.DELIVERING, null, null);
 
         // 封装OrderStatisticsVO
         OrderStatisticsVO orderStatisticsVO = new OrderStatisticsVO();

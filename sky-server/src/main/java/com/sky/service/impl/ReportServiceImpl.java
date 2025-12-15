@@ -1,10 +1,12 @@
 package com.sky.service.impl;
 
+import com.sky.constant.OrderConstant;
 import com.sky.dto.DateCountDTO;
 import com.sky.dto.DateSumDTO;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
+import com.sky.vo.OrderReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -73,9 +75,9 @@ public class ReportServiceImpl implements ReportService {
 
     /**
      * 获取用户统计数据
+     *
      * @param begin
      * @param end
-     *
      * @return
      */
     public UserReportVO getUserStatistics(LocalDate begin, LocalDate end) {
@@ -88,8 +90,8 @@ public class ReportServiceImpl implements ReportService {
         // 起始日期前的用户数量
         int totalUser = userMapper.countBefore(beginDateTime);
         // 有新增用户数的日期列表
-        List<DateCountDTO> dateCountList = userMapper.countNewUserByDateBetween(beginDateTime, endDateTime);
-        Map<LocalDate,Integer> newUserMap = dateCountList.stream().collect(
+        List<DateCountDTO> newUserCounts = userMapper.countNewUserByDateBetween(beginDateTime, endDateTime);
+        Map<LocalDate, Integer> newUserMap = newUserCounts.stream().collect(
                 Collectors.toMap(DateCountDTO::getDate, DateCountDTO::getCount));
 
         while (!begin.isAfter(end)) {
@@ -104,7 +106,7 @@ public class ReportServiceImpl implements ReportService {
         }
 
         String dateListString = StringUtils.join(dateList, ",");
-        String newUserListString =  StringUtils.join(newUserList, ",");
+        String newUserListString = StringUtils.join(newUserList, ",");
         String totalUserListString = StringUtils.join(totalUserList, ",");
 
         UserReportVO userReportVO = new UserReportVO();
@@ -112,5 +114,55 @@ public class ReportServiceImpl implements ReportService {
         userReportVO.setNewUserList(newUserListString);
         userReportVO.setTotalUserList(totalUserListString);
         return userReportVO;
+    }
+
+    /**
+     * 获取订单统计数据
+     *
+     * @param begin
+     * @param end
+     * @return
+     */
+    public OrderReportVO getOrderStatistics(LocalDate begin, LocalDate end) {
+        LocalDateTime beginDateTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endDateTime = LocalDateTime.of(end, LocalTime.MAX);
+        List<LocalDate> dateList = new ArrayList<>();
+        List<Integer> orderCountList = new ArrayList<>();
+        List<Integer> validOrderCountList = new ArrayList<>();
+
+        int totalOrderCount = 0;
+        int totalValidOrderCount = 0;
+        List<DateCountDTO> newOrderCounts = orderMapper.countByDate(null, beginDateTime, endDateTime);
+        List<DateCountDTO> newValidOrderCounts = orderMapper.countByDate(OrderConstant.Status.COMPLETED, beginDateTime, endDateTime);
+        Map<LocalDate,Integer> newOrderMap = newOrderCounts.stream().collect(
+                Collectors.toMap(DateCountDTO::getDate, DateCountDTO::getCount));
+        Map<LocalDate,Integer> newValidOrderMap = newValidOrderCounts.stream().collect(
+                Collectors.toMap(DateCountDTO::getDate, DateCountDTO::getCount));
+
+        while (!begin.isAfter(end)) {
+            dateList.add(begin);
+            int orderCount = newOrderMap.getOrDefault(begin, 0);
+            int validOrderCount = newValidOrderMap.getOrDefault(begin, 0);
+            totalOrderCount += orderCount;
+            totalValidOrderCount += validOrderCount;
+            orderCountList.add(orderCount);
+            validOrderCountList.add(validOrderCount);
+            begin = begin.plusDays(1);
+        }
+
+        String dateListString = StringUtils.join(dateList, ",");
+        String orderCountListString = StringUtils.join(orderCountList, ",");
+        String validOrderCountListString = StringUtils.join(validOrderCountList, ",");
+        double completionRate = totalOrderCount == 0 ? 0 : (double) totalValidOrderCount / totalOrderCount;
+
+        OrderReportVO orderReportVO = new OrderReportVO();
+        orderReportVO.setDateList(dateListString);
+        orderReportVO.setOrderCountList(orderCountListString);
+        orderReportVO.setValidOrderCountList(validOrderCountListString);
+        orderReportVO.setTotalOrderCount(totalOrderCount);
+        orderReportVO.setValidOrderCount(totalValidOrderCount);
+        orderReportVO.setOrderCompletionRate(completionRate);
+
+        return orderReportVO;
     }
 }

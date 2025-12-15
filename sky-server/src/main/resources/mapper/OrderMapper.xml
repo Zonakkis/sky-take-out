@@ -24,6 +24,37 @@
         </where>
         order by order_time desc
     </select>
+    <select id="count" resultType="java.lang.Integer">
+        select count(*)
+        from `order`
+        <where>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="begin != null">
+                and order_time &gt;= #{begin}
+            </if>
+            <if test="end != null">
+                and order_time &lt;= #{end}
+            </if>
+        </where>
+    </select>
+    <select id="countByDate" resultType="com.sky.dto.DateCountDTO">
+        select count(*) as count, date(order_time) as date
+        from `order`
+        <where>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="begin != null">
+                and order_time &gt;= #{begin}
+            </if>
+            <if test="end != null">
+                and order_time &lt;= #{end}
+            </if>
+        </where>
+        group by date(order_time)
+    </select>
     <update id="update" parameterType="com.sky.entity.Order">
         update `order`
         <set>

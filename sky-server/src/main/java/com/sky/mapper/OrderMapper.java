@@ -1,6 +1,7 @@
 package com.sky.mapper;
 
 import com.github.pagehelper.Page;
+import com.sky.dto.DateCountDTO;
 import com.sky.dto.DateSumDTO;
 import com.sky.dto.OrderPageQueryDTO;
 import com.sky.entity.Order;
@@ -9,8 +10,6 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -35,13 +34,22 @@ public interface OrderMapper {
     void insert(Order order);
 
     /**
-     * 根据订单状态查询订单数量
+     * 查询订单数量
      *
      * @param status
      * @return
      */
-    @Select("select count(*) from `order` where status = #{status}")
-    Integer countByStatus(Integer status);
+    Integer count(Integer status, LocalDateTime begin, LocalDateTime end);
+
+    /**
+     * 按日期查询订单数量
+     *
+     * @param status
+     * @return
+     */
+    List<DateCountDTO> countByDate(Integer status, LocalDateTime begin, LocalDateTime end);
+
+
 
     /**
      * 根据日期范围汇总订单金额
