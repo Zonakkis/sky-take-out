@@ -1,9 +1,11 @@
 package com.sky.mapper;
 
+import com.sky.dto.SalesCountDTO;
 import com.sky.entity.OrderDetail;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -14,6 +16,16 @@ public interface OrderDetailMapper {
      * @param orderDetails
      */
     void insertBatch(List<OrderDetail> orderDetails);
+
+
+    /**
+     * 统计指定时间段内的菜品销量排行前十
+     *
+     * @param begin
+     * @param end
+     * @return
+     */
+    List<SalesCountDTO> countSalesTop10Between(LocalDateTime begin, LocalDateTime end);
 
     /**
      * 根据订单id查询订单明细

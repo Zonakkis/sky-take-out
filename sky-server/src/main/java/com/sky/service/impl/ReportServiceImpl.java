@@ -3,10 +3,13 @@ package com.sky.service.impl;
 import com.sky.constant.OrderConstant;
 import com.sky.dto.DateCountDTO;
 import com.sky.dto.DateSumDTO;
+import com.sky.dto.SalesCountDTO;
+import com.sky.mapper.OrderDetailMapper;
 import com.sky.mapper.OrderMapper;
 import com.sky.mapper.UserMapper;
 import com.sky.service.ReportService;
 import com.sky.vo.OrderReportVO;
+import com.sky.vo.SalesTop10ReportVO;
 import com.sky.vo.TurnoverReportVO;
 import com.sky.vo.UserReportVO;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +34,8 @@ public class ReportServiceImpl implements ReportService {
     private OrderMapper orderMapper;
     @Autowired
     private UserMapper userMapper;
+    @Autowired
+    private OrderDetailMapper orderDetailMapper;
 
     public ReportServiceImpl(OrderMapper orderMapper, UserMapper userMapper) {
         this.orderMapper = orderMapper;
@@ -134,9 +139,9 @@ public class ReportServiceImpl implements ReportService {
         int totalValidOrderCount = 0;
         List<DateCountDTO> newOrderCounts = orderMapper.countByDate(null, beginDateTime, endDateTime);
         List<DateCountDTO> newValidOrderCounts = orderMapper.countByDate(OrderConstant.Status.COMPLETED, beginDateTime, endDateTime);
-        Map<LocalDate,Integer> newOrderMap = newOrderCounts.stream().collect(
+        Map<LocalDate, Integer> newOrderMap = newOrderCounts.stream().collect(
                 Collectors.toMap(DateCountDTO::getDate, DateCountDTO::getCount));
-        Map<LocalDate,Integer> newValidOrderMap = newValidOrderCounts.stream().collect(
+        Map<LocalDate, Integer> newValidOrderMap = newValidOrderCounts.stream().collect(
                 Collectors.toMap(DateCountDTO::getDate, DateCountDTO::getCount));
 
         while (!begin.isAfter(end)) {
@@ -164,5 +169,31 @@ public class ReportServiceImpl implements ReportService {
         orderReportVO.setOrderCompletionRate(completionRate);
 
         return orderReportVO;
+    }
+
+    /**
+     * 获取销售前十统计数据
+     *
+     * @param begin
+     * @param end
+     * @return
+     */
+    public SalesTop10ReportVO getSalesTop10Statistics(LocalDate begin, LocalDate end) {
+        LocalDateTime beginDateTime = LocalDateTime.of(begin, LocalTime.MIN);
+        LocalDateTime endDateTime = LocalDateTime.of(end, LocalTime.MAX);
+
+        List<SalesCountDTO> salesCountDTOS = orderDetailMapper.countSalesTop10Between(beginDateTime, endDateTime);
+
+        String nameListString = salesCountDTOS.stream()
+                .map(SalesCountDTO::getName)
+                .collect(Collectors.joining(","));
+        String numberListString = salesCountDTOS.stream()
+                .map(dto -> dto.getCount().toString())
+                .collect(Collectors.joining(","));
+
+        SalesTop10ReportVO salesTop10ReportVO = new SalesTop10ReportVO();
+        salesTop10ReportVO.setNameList(nameListString);
+        salesTop10ReportVO.setNumberList(numberListString);
+        return salesTop10ReportVO;
     }
 }

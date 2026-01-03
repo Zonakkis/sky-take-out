@@ -12,6 +12,15 @@
             #{orderDetail.amount})
         </foreach>
     </insert>
+    <select id="countSalesTop10Between" resultType="com.sky.dto.SalesCountDTO">
+        select name, sum(od.number) as count
+        from order_detail od
+                 join `order` o
+                      on order_id = o.id and o.status = 5 and o.order_time between #{begin} and #{end}
+        group by name
+        order by count desc
+        limit 0, 10
+    </select>
     <select id="getByOrderIds" resultType="com.sky.entity.OrderDetail">
         select id, name, image, order_id, dish_id, setmeal_id, dish_flavor, number, amount
         from order_detail
