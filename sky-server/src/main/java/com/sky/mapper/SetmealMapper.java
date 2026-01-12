@@ -15,14 +15,6 @@ import java.util.List;
 @Mapper
 public interface SetmealMapper {
 
-    /**
-     * 根据分类id查询套餐的数量
-     *
-     * @param id
-     * @return
-     */
-    @Select("select count(id) from setmeal where category_id = #{categoryId}")
-    Integer countByCategoryId(Long id);
 
     /**
      * 插入套餐
@@ -36,6 +28,15 @@ public interface SetmealMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id")
     @AutoFill(OperationType.INSERT)
     void insert(Setmeal setmeal);
+
+
+    /**
+     * 查询套餐数量
+     *
+     * @param status
+     * @return
+     */
+    Integer count(Integer status);
 
     /**
      * 根据id查询套餐

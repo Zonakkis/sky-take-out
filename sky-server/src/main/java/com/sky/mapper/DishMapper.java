@@ -10,6 +10,7 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
 import org.apache.ibatis.annotations.Select;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Mapper
@@ -28,16 +29,14 @@ public interface DishMapper {
     @AutoFill(OperationType.INSERT)
     void insert(Dish dish);
 
-
     /**
-     * 根据分类id查询菜品数量
+     * 统计菜品数量
      *
+     * @param status
      * @param categoryId
      * @return
      */
-    @Select("select count(id) from dish where category_id = #{categoryId}")
-    Integer countByCategoryId(Long categoryId);
-
+    Integer count(Integer status, Long categoryId);
 
     /**
      * 根据分类id和状态查询菜品列表

@@ -133,7 +133,7 @@ public class CategoryServiceImpl implements CategoryService {
      * @param id
      */
     public void deleteById(Long id) {
-        Integer count = dishMapper.countByCategoryId(id);
+        Integer count = dishMapper.count(null, id);
         if (count > 0) {
             throw new DeletionNotAllowedException(MessageConstant.CATEGORY_BE_RELATED_BY_DISH);
         }

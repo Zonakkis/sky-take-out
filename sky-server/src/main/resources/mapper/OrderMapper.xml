@@ -55,6 +55,21 @@
         </where>
         group by date(order_time)
     </select>
+    <select id="sumAmount" resultType="java.lang.Double">
+        select sum(amount)
+        from `order`
+        <where>
+            <if test="status != null">
+                and status = #{status}
+            </if>
+            <if test="begin != null">
+                and order_time &gt;= #{begin}
+            </if>
+            <if test="end != null">
+                and order_time &lt;= #{end}
+            </if>
+        </where>
+    </select>
     <update id="update" parameterType="com.sky.entity.Order">
         update `order`
         <set>

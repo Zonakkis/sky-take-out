@@ -50,6 +50,13 @@ public interface OrderMapper {
     List<DateCountDTO> countByDate(Integer status, LocalDateTime begin, LocalDateTime end);
 
 
+    /**
+     * 汇总订单金额
+     *
+     * @param status
+     * @return
+     */
+    Double sumAmount(Integer status, LocalDateTime begin, LocalDateTime end);
 
     /**
      * 根据日期范围汇总订单金额
