@@ -32,7 +32,7 @@
         <jjwt>0.9.1</jjwt>
         <jaxb-api>2.3.1</jaxb-api>
         <jackson>2.13.3</jackson>
-        <poi>3.16</poi>
+        <poi>5.5.1</poi>
     </properties>
     <dependencyManagement>
         <dependencies>
@@ -133,11 +133,13 @@
                 <artifactId>poi</artifactId>
                 <version>${poi}</version>
             </dependency>
+
             <dependency>
                 <groupId>org.apache.poi</groupId>
                 <artifactId>poi-ooxml</artifactId>
                 <version>${poi}</version>
             </dependency>
+
             <!--微信支付-->
             <dependency>
                 <groupId>com.github.wechatpay-apiv3</groupId>
